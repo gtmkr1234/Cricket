@@ -1,7 +1,11 @@
+import { Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import * as socketio from 'socket.io';
+import { Server } from 'socket.io';
+
+@Module({})
+class SocketModule {}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,7 +13,9 @@ async function bootstrap() {
   app.useWebSocketAdapter(new IoAdapter(app));
 
   const server = app.getHttpServer();
-  const io = new socketio.Server(server, { cors: true });
+  const io = new Server(server);
+
+  let scoreInterval: NodeJS.Timeout;
 
   io.on('connection', (socket) => {
     console.log('New client connected');
@@ -28,4 +34,5 @@ async function bootstrap() {
 
   await app.listen(3000);
 }
+
 bootstrap();
